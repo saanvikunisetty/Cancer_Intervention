@@ -124,3 +124,26 @@ anova_table <- anova_tidy %>%
     locations = cells_column_labels(everything())
   )
 anova_table
+
+interaction_plot <- ggplot(stats_summary, 
+                           aes(x = Sun_Exposure, y = Mean_Pop, color = Genotype, group = Genotype)) +
+  geom_point(size = 6) +                  # make points bigger
+  geom_line(size = 2) +                   # make lines thicker
+  geom_errorbar(aes(ymin = Mean_Pop - SE_Pop, ymax = Mean_Pop + SE_Pop), 
+                width = 0.2, size = 1.5) + # thicker error bars
+  labs(
+    title = "Interaction Plot: Genotype × Sun Exposure",
+    x = "Sun Exposure",
+    y = "Mean Population Count",
+    color = "Genotype"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 30, face = "bold"),
+    axis.title = element_text(size = 22, face = "bold"),
+    axis.text = element_text(size = 18),
+    legend.title = element_text(size = 30, face = "bold"),
+    legend.text = element_text(size = 22)
+  )
+
+interaction_plot
