@@ -63,3 +63,64 @@ table_gt <- stats_summary %>%
     locations = cells_body()
   )
 print(table_gt)
+
+mean_pop_plot <- ggplot(stats_summary, aes(x = Sun_Exposure, y = Mean_Pop, fill = Genotype)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
+  geom_errorbar(aes(ymin = Mean_Pop - SE_Pop, ymax = Mean_Pop + SE_Pop),
+                position = position_dodge(width = 0.9), width = 0.3) +
+  labs(
+    title = "Mean Population Count by Genotype and Sun Exposure",
+    x = "Sun Exposure",
+    y = "Mean Population Count",
+    fill = "Genotype"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 28, face = "bold"),       
+    axis.title.x = element_text(size = 22, face = "bold"),     
+    axis.title.y = element_text(size = 22, face = "bold"),   
+    axis.text.x = element_text(size = 18),                
+    axis.text.y = element_text(size = 18),           
+    legend.title = element_text(size = 20, face = "bold"),    
+    legend.text = element_text(size = 18)                      
+  )
+
+anova_model <- aov(Population_Count ~ Genotype * Sun_Exposure, data = data)
+summary(anova_model)
+install.packages(c("broom", "gt"))
+
+library(broom)
+library(gt)
+
+# Convert ANOVA model to tidy data frame
+anova_tidy <- broom::tidy(anova_model)
+
+# Make it a nice gt table
+anova_table <- anova_tidy %>%
+  gt() %>%
+  tab_header(
+    title = md("**Two-Way ANOVA Results**"),
+    subtitle = "Genotype × Sun Exposure effects on Population Count"
+  ) %>%
+  fmt_number(
+    columns = c("sumsq", "meansq", "statistic", "p.value"),
+    decimals = 3
+  ) %>%
+  tab_options(
+    table.font.names = "Times New Roman",
+    table.font.size = 12,
+    heading.align = "center"
+  ) %>%
+  cols_label(
+    term = "Factor",
+    df = "DF",
+    sumsq = "Sum of Squares",
+    meansq = "Mean Square",
+    statistic = "F-value",
+    p.value = "p-value"
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(everything())
+  )
+anova_table
