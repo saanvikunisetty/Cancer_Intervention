@@ -21,3 +21,45 @@ data <- tribble(
 
 print(data)
 summary(data)
+
+stats_summary <- data %>%
+  group_by(Genotype, Sun_Exposure) %>%
+  summarise(
+    Mean_Pop = mean(Population_Count),
+    SD_Pop = sd(Population_Count),
+    SE_Pop = sd(Population_Count) / sqrt(n()),
+    n = n()
+  )
+
+print(stats_summary)
+
+install.packages(c("gt", "webshot2", "dplyr"))
+library(gt)
+library(dplyr)
+library(webshot2)
+table_gt <- stats_summary %>%
+  gt() %>%
+  tab_header(
+    title = md("**Summary Statistics of Experimental Data**"),
+    subtitle = "Generated from Cancer_Intervention Dataset"
+  ) %>%
+  fmt_number(
+    columns = where(is.numeric),
+    decimals = 2
+  ) %>%
+  tab_options(
+    table.font.names = "Times New Roman",
+    table.font.size = 12,
+    heading.align = "center",
+    data_row.padding = px(6),
+    table.border.top.color = "black",
+    table.border.bottom.color = "black"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "#f8f9fa"),
+      cell_borders(sides = "bottom", color = "gray80", weight = px(1))
+    ),
+    locations = cells_body()
+  )
+print(table_gt)
